@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sita Decision Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .user-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .user-badge:hover {
+            background: #764ba2;
+        }
+
+        .decision-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-agreed {
+            background: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Sita Decision Engine</h1>
+            <p>Research-backed parenting decisions for your family</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('new-decision')">New Decision</button>
+            <button class="tab-button" onclick="switchTab('history')">History</button>
+        </div>
+
+        <!-- NEW DECISION TAB -->
+        <div id="new-decision" class="tab-content active">
+            <div class="user-badge" onclick="switchUser()">
+                👤 Current User: <strong id="current-user">Parshva</strong>
+                <span style="margin-left: 10px; font-size: 12px;">[Click to switch]</span>
+            </div>
+
+            <div id="message-area"></div>
+
+            <form id="decision-form">
+                <div class="form-group">
+                    <label>What decision are you facing?</label>
+                    <select id="decision-type" required>
+                        <option value="">-- Select --</option>
+                        <option value="childcare">Preschool/Childcare Hours</option>
+                        <option value="potty">Potty Training</option>
+                        <option value="behavior">Behavioral Challenges</option>
+                        <option value="social">Social & Peer Development</option>
+                        <option value="sleep">Sleep & Routine</option>
+                        <option value="health">Health/Nutrition</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Describe your situation (1-2 sentences)</label>
+                    <textarea id="question" placeholder="E.g., Sita seems tired at preschool. Should we reduce hours?" required></textarea>
+                </div>
+
+                <button type="submit">Submit Decision</button>
+            </form>
+        </div>
+
+        <!-- HISTORY TAB -->
+        <div id="history" class="tab-content">
+            <h2 style="margin-bottom: 20px;">Decision History</h2>
+            <button onclick="loadHistory()" style="margin-bottom: 20px;">Refresh from Sheet</button>
+            <div id="history-list">
+                <p style="color: #999;">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURE THIS - Replace with your Apps Script URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyNX3i0IyOpuIKYgaXhPA1cJO6wkVW-GKNojiiy7Sctm1G2NqKjT1pwv8c2rhR7Q5jN/exec';
+
+        let currentUser = 'Parshva';
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'history') loadHistory();
+        }
+
+        // User switching
+        function switchUser() {
+            currentUser = currentUser === 'Parshva' ? 'Shalini' : 'Parshva';
+            document.getElementById('current-user').textContent = currentUser;
+            showMessage('Switched to ' + currentUser, 'info');
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('message-area');
+            messageArea.innerHTML = '<div class="message ' + type + '">' + text + '</div>';
+        }
+
+        // Form submission
+        document.getElementById('decision-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const decisionType = document.getElementById('decision-type').value;
+            const question = document.getElementById('question').value;
+
+            showMessage('Submitting...', 'info');
+
+            try {
+                const payload = {
+                    parent_name: currentUser,
+                    decision_type: decisionType,
+                    question: question,
+                    status: 'pending'
+                };
+
+                // Add to Apps Script
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('✅ Decision saved! ID: ' + data.decision_id + ' - Check History tab to see it in the Google Sheet', 'success');
+                    document.getElementById('decision-form').reset();
+                } else {
+                    showMessage('Error: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message + ' (Check if Apps Script URL is configured)', 'error');
+            }
+        });
+
+        // Load history
+        async function loadHistory() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = '<p style="color: #999;">Loading from Google Sheet...</p>';
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    historyList.innerHTML = '<p style="color: #999;">No decisions yet.</p>';
+                    return;
+                }
+
+                historyList.innerHTML = data.map(row => `
+                    <div class="decision-card">
+                        <h3>${row.Question || 'N/A'}</h3>
+                        <p><strong>ID:</strong> ${row.Decision_ID || 'N/A'}</p>
+                        <p><strong>Type:</strong> ${row.Decision_Type || 'N/A'}</p>
+                        <p><strong>Created by:</strong> ${row.Parent_Name || 'N/A'}</p>
+                        <p><strong>Time:</strong> ${row.Timestamp || 'N/A'}</p>
+                        <span class="status-badge status-${row.Status}">${(row.Status || 'pending').toUpperCase()}</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                historyList.innerHTML = '<div class="message error">Error loading: ' + error.message + '</div>';
+            }
+        }
+
+        // Show message on load
+        window.addEventListener('load', () => {
+            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyNX3i0IyOpuIKYgaXhPA1cJO6wkVW-GKNojiiy7Sctm1G2NqKjT1pwv8c2rhR7Q5jN/exec') {
+                showMessage('⚠️ Configure your Apps Script URL in the code first!', 'error');
+            } else {
+                showMessage('✅ Ready! Parshva is logged in. Click badge to switch to Shalini.', 'success');
+            }
+        });
+    </script>
+</body>
+</html>
