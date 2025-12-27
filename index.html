@@ -1022,19 +1022,19 @@
                     const decision = this.decisions.find(d => d.id === this.currentDecisionId);
                     
                     const response = await fetch(SUPABASE_FUNCTION_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            situation: decision.description,
-                            parentType: this.currentParent,
-                            previousAnswers: this.currentAnswers,
-                            questionNumber: this.currentQuestionNumber,
-                            parentProfile: this.parents[this.currentParent].profile
-                        })
-                    });
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        situation: decision.description,
+        parentType: this.currentParent,
+        previousAnswers: this.currentAnswers,
+        questionNumber: this.currentQuestionNumber,
+        parentProfile: this.parents[this.currentParent].profile
+    })
+});
+
 
                     const data = await response.json();
                     console.log("Question response:", data);
